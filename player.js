@@ -1,9 +1,9 @@
-var playlist = [];
-    var it = 0;
+      var playlist = [];
+      var it = 0;
     	var screen = document.getElementById('relvid');
-    	var screenList = document.getElementById('list');
-    	var searchList = document.getElementById('searchList');
-    	var firstVideo = 'ZLVVBTePZSg';
+    	var screenList = document.getElementById('queue');
+    	var searchList = document.getElementById('searchResults');
+    	var firstVideo = 'Ut92P3ZTid4';
       // 2. This code loads the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
 		
@@ -17,7 +17,7 @@ var playlist = [];
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
           height: '390',
-          width: '640',
+          width: '640', 
           videoId: firstVideo,
           events: {
             'onReady': onPlayerReady,
@@ -72,10 +72,34 @@ var playlist = [];
 //  	    screen.innerHTML = "<br>Related Videos<br>";
 //  	    screen.innerHTML += "<ul id='relvid'>";
   	    for(var i = 0; i < n; i++){
-  	    	screen.innerHTML += "<li onClick = 'getIndex(this);'>" + (i+1) + ". " + data.items[i].snippet.title + "</li>";
+  	    	screen.innerHTML += "<li>" + data.items[i].snippet.title + "<br><button class='btn' onClick='addFromRelated(this)'>Queue</button> <button class='btn' onClick='playFromRelated(this)'>Play</button></li>";
   	    }
 //	      screen.innerHTML += "</ul>"; 
       }
+      
+      function addFromRelated(node){
+          var childs = node.parentNode.parentNode.childNodes;
+          var i;
+          for(i = 0; i < childs.length; i++){
+              if(node.parentNode == childs[i]) break;
+          }
+          //console.log(i);
+          playlist.push(data.items[i]);
+          refreshList();
+      }
+      
+      function playFromRelated(node){
+          var childs = node.parentNode.parentNode.childNodes;
+          var i;
+          for(i = 0; i < childs.length; i++){
+              if(node.parentNode == childs[i]) break;
+          }
+          playlist = [];
+      	  playlist.push(data.items[i]);
+      	  refreshList();	
+      	  playThis(data.items[i].id.videoId);
+      }
+    
       function getIndex(node) {
         var i;
         var childs = node.parentNode.childNodes;
@@ -105,11 +129,34 @@ var playlist = [];
 	    var source=getSource(url);
     	dataSearch = JSON.parse(source);
     	var n = dataSearch.items.length;
-    	searchList.innerHTML = "<br>Search Results<br>";
+//    	searchList.innerHTML = "<br>Search Results<br>";
     	for(var i = 0; i < n; i++){
-    		searchList.innerHTML += (i+1) + ". " + dataSearch.items[i].snippet.title + '<br>';
+    		searchList.innerHTML += "<li>" + dataSearch.items[i].snippet.title + "<br><button class='btn' onClick='addFromSearch(this)'>Queue</button> <button class='btn' onClick='playFromSearch(this)'>Play</button></li>";
     	}
    	  }	
+      
+      function playFromSearch(node){
+          var childs = node.parentNode.parentNode.childNodes;
+          var i;
+          for(i = 0; i < childs.length; i++){
+              if(node.parentNode == childs[i]) break;
+          }
+          playlist = [];
+      	  playlist.push(data.items[i]);
+      	  refreshList();	
+      	  playThis(dataSearch.items[i].id.videoId);          
+      }
+      
+      function addFromSearch(node){
+          var childs = node.parentNode.parentNode.childNodes;
+          var i;
+          for(i = 0; i < childs.length; i++){
+              if(node.parentNode == childs[i]) break;
+          }
+          //console.log(i);
+          playlist.push(dataSearch.items[i]);
+          refreshList();          
+      }
       
       function nextRelated(){
       	var i = Number(document.getElementById("numRelated").value) - 1;
@@ -148,13 +195,22 @@ var playlist = [];
       
       
       function refreshList(){
-      	console.log(playlist);
+      	//console.log(playlist);
       	var n = playlist.length;
-      	screenList.innerHTML = "<br>Playlist<br>";
+      	screenList.innerHTML = "";
       	for(var i = 0;i < n; i++){
-      		screenList.innerHTML += (i+1) + ". " + playlist[i].snippet.title + '<br>';
+      		screenList.innerHTML += "<li>" + playlist[i].snippet.title + "<br><button class='btn' onClick='playFromQueue(this)'>Play</button></li>";
       	}
-//      	screen.innerHTML += x;
+      }
+      
+      function playFromQueue(node){
+          var childs = node.parentNode.parentNode.childNodes;
+          var i;
+          for(i = 0; i < childs.length; i++){
+              if(node.parentNode == childs[i]) break;
+          } 
+          it = i;
+          playThis(playlist[it].id.videoId);
       }
       
       function getSource(url){
@@ -169,4 +225,39 @@ var playlist = [];
 		  	it = Number(document.getElementById("numList").value) - 1;
 		  	document.getElementById("numList").value = "";
 		  	playThis(playlist[it].id.videoId);
-      }    
+      }
+      
+      
+      $(document).ready(function() {
+            $( "#searchThis" ).autocomplete({
+            source: function(request, response) {
+            $.getJSON("http://suggestqueries.google.com/complete/search?callback=?",
+                {
+                  "hl":"en", // Language
+                  "ds":"yt", // Restrict lookup to youtube
+                  "jsonp":"suggestCallBack", // jsonp callback function name
+                  "q":request.term, // query term
+                  "client":"youtube" // force youtube style response, i.e. jsonp
+                }
+            );
+            suggestCallBack = function (data) {
+                var suggestions = [];
+                $.each(data[1], function(key, val) {
+                    suggestions.push({"value":val[0]});
+                });
+                suggestions.length = 5; // prune suggestions list to only 5 items
+                response(suggestions);
+            };
+        },
+          select: function( event, ui ) {document.getElementById("searchThis").value=ui.item.value; getSearch();}
+        });
+        $("#searchThis").keypress(function(e) {
+            
+            if(e.keyCode == 13) {
+                $(".ui-menu-item").hide();
+                getSearch();
+            }
+        });
+    });
+
+      
