@@ -1,8 +1,41 @@
 body {
+    background-color: #f1f1f1;
   min-height: 1000px;
   padding-top: 70px;
+  font-family: 'Roboto', sans-serif;
 }
 
-.col-lg-8 .col-lg-4 .col-lg-9 .col-lg-3{
-	background-color : #060;
+#player-container, #list, #output, #searchList{
+    padding:10px;
+	background-color : #fff;
+}
+
+#player-container, #list{
+    margin-bottom: 10px;
+}
+
+#searchThis{
+    width: 500px;
+}
+
+.navbar-fixed-top{
+    background-color: #fff;
+}
+
+li{
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+li:last-child{
+    border-bottom: none;
+}
+
+ul{
+    max-width: 500px;
+    background-color : #fff;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
