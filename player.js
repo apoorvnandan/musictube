@@ -71,6 +71,7 @@
   	    var n = data.items.length;
 //  	    screen.innerHTML = "<br>Related Videos<br>";
 //  	    screen.innerHTML += "<ul id='relvid'>";
+        screen.innerHTML = "";
   	    for(var i = 0; i < n; i++){
   	    	screen.innerHTML += "<li>" + data.items[i].snippet.title + "<br><button class='btn' onClick='addFromRelated(this)'>Queue</button> <button class='btn' onClick='playFromRelated(this)'>Play</button></li>";
   	    }
@@ -130,6 +131,7 @@
     	dataSearch = JSON.parse(source);
     	var n = dataSearch.items.length;
 //    	searchList.innerHTML = "<br>Search Results<br>";
+        searchList.innerHTML = "";
     	for(var i = 0; i < n; i++){
     		searchList.innerHTML += "<li>" + dataSearch.items[i].snippet.title + "<br><button class='btn' onClick='addFromSearch(this)'>Queue</button> <button class='btn' onClick='playFromSearch(this)'>Play</button></li>";
     	}
@@ -259,5 +261,28 @@
             }
         });
     });
-
+    
+    /*
+    $("#searchThis").autocomplete({
+        source: function(request, response) {
+            $.getJSON("http://suggestqueries.google.com/complete/search?callback=?",
+                {
+                  "hl":"en", // Language
+                  "ds":"yt", // Restrict lookup to youtube
+                  "jsonp":"suggestCallBack", // jsonp callback function name
+                  "q":request.term, // query term
+                  "client":"youtube" // force youtube style response, i.e. jsonp
+                }
+            );
+            suggestCallBack = function (data) {
+                var suggestions = [];
+                $.each(data[1], function(key, val) {
+                    suggestions.push({"value":val[0]});
+                });
+                suggestions.length = 5; // prune suggestions list to only 5 items
+                response(suggestions);
+            };
+        },
+    });    
+    */  
       
