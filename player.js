@@ -51,7 +51,10 @@
       }
       function stopVideo() {
         player.stopVideo();
-        	
+        if(it + 1 < playlist.length){
+            playThis(playlist[it+1]);
+            it++;
+        }	
       }
       
       function playNext(){
